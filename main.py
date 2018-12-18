@@ -12,3 +12,7 @@ def main():
     sim = Simulator(parse_args())
     sim.setup()
     sim.run()
+
+
+if __name__ == "__main__":
+    main()

@@ -17,6 +17,7 @@ def asmph(func):
             return func(self, s)
     return tomph
 
+
 def asfps(func):
     def tomph(self, s):
         try:
@@ -25,6 +26,7 @@ def asfps(func):
             return func(self, s)
     return tomph
 
+
 def askph(func):
     def tomph(self, s):
         try:
@@ -32,6 +34,7 @@ def askph(func):
         except AttributeError:
             return func(self, s)
     return tomph
+
 
 def asmps(func):
     def tomph(self, s):

@@ -2,9 +2,11 @@
 
 
 class Car:
-    def __init__(self, road, speed):
-        self.road = road
+    length = 5
+
+    def __init__(self, speed):
         self.speed = speed
+        self.crashed = False
 
     def __str__(self):
-        return "<>"
+        return "*" if self.crashed else ">"
