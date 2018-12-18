@@ -7,7 +7,7 @@ from .speed import MPH, FPS, KPH, MPS
 class Simulator:
     def __init__(self, args):
         self.sleep_dur = .25
-        self.road = Road()
+        self.road = Road(nlanes=3)
         self.ncars = args.ncars
         self.tstep = 0
 
@@ -53,7 +53,7 @@ class Simulator:
         print("Todo...")
 
     def one_step(self):
-        pass
+        self.road.step()
 
     def spawn_cars(self):
         pass
