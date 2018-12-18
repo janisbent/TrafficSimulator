@@ -1,12 +1,10 @@
 import time
-from .car import Car
 from .road import Road
-from .speed import MPH, FPS, KPH, MPS
 
 
 class Simulator:
     def __init__(self, args):
-        self.sleep_dur = .25
+        self.sleep_dur = .5
         self.road = Road(nlanes=3)
         self.ncars = args.ncars
         self.tstep = 0
@@ -35,17 +33,17 @@ class Simulator:
                     self.one_step()
                     self.print()
                     time.sleep(self.sleep_dur)
-                    self.tstep += 1
             else:
                 while True:
                     self.one_step()
                     self.print()
                     time.sleep(self.sleep_dur)
-                    self.tstep += 1
         except KeyboardInterrupt:
             i = ""
             while i not in ["c", "q"]:
-                i = input("'c' to continue, 'q' to quit, 'h' for help> ")
+                i = input("'c' to continue, 'q' to quit, 's' for one step, 'h' for help> ")
+                if i == "s":
+                    self.one_step()
             if i == "c":
                 self.run(n=n)
 
@@ -53,6 +51,7 @@ class Simulator:
         print("Todo...")
 
     def one_step(self):
+        self.tstep += 1
         self.road.step()
 
     def spawn_cars(self):
