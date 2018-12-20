@@ -7,11 +7,12 @@ from .situation import Situation
 # TODO: docstring
 class Road:
     def __init__(self, nlanes=1, spawn=0.6, length=100):
-        self.lanes = [EdgeLane(length=length, marker="=")]
+        self.lanes = [EdgeLane(0, length=length, marker="=")]
         for _ in range(nlanes):
-            self.lanes += [DrivingLane(spawnr=spawn / nlanes, length=length), DottedLane(length=length)]
+            self.lanes += [DrivingLane(len(self.lanes), spawnr=spawn / nlanes, length=length),
+                           DottedLane(len(self.lanes) + 1, length=length)]
         self.lanes.pop()
-        self.lanes += [EdgeLane(length=length)]
+        self.lanes += [EdgeLane(len(self.lanes) + 1, length=length)]
         self.length = length
         self.cars = []
 
@@ -48,7 +49,8 @@ class Road:
 
 
 class Lane:
-    def __init__(self, spawnr, length, marker):
+    def __init__(self, laneno, spawnr, length, marker):
+        self.laneno = laneno
         self.spawnr = spawnr
         self.segments = [Segment(0, length, marker)]
 
@@ -63,7 +65,7 @@ class Lane:
 
     def spawn(self):
         if not self[Car.length - 1] and random.random() < self.spawnr:
-            return Car(MPH(self.segments[0].speedl), 1)
+            return Car(MPH(self.segments[0].speedl), self.laneno)
 
     def clear(self):
         for s in self.segments:
@@ -71,21 +73,21 @@ class Lane:
 
 
 class DrivingLane(Lane):
-    def __init__(self, spawnr=1.0, length=10):
-        super(DrivingLane, self).__init__(spawnr, length, " ")
+    def __init__(self, laneno, spawnr=1.0, length=10):
+        super(DrivingLane, self).__init__(laneno, spawnr, length, " ")
         self.drivable = True
 
 
 class EdgeLane(Lane):
-    def __init__(self, spawnr=0, length=10, marker="-"):
-        super(EdgeLane, self).__init__(spawnr, length, marker)
+    def __init__(self, laneno, spawnr=0, length=10, marker="-"):
+        super(EdgeLane, self).__init__(laneno, spawnr, length, marker)
         self.drivable = False
         self.marker = marker
 
 
 class DottedLane(Lane):
-    def __init__(self, spawnr=0, length=10):
-        super(DottedLane, self).__init__(spawnr, length, "- ")
+    def __init__(self, laneno, spawnr=0, length=10):
+        super(DottedLane, self).__init__(laneno, spawnr, length, "- ")
         self.drivable = False
 
 

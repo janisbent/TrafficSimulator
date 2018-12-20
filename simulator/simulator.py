@@ -6,7 +6,7 @@ from .road import Road
 class Simulator:
     def __init__(self, args):
         self.sleep_dur = .1
-        self.road = Road(nlanes=1, spawn=.05)
+        self.road = Road(nlanes=3, spawn=.05)
         self.ncars = args.ncars
         self.tstep = 0
 
@@ -25,8 +25,7 @@ class Simulator:
 
     def print(self):
         print("tstep:", self.tstep)
-        print(self.road)
-        print()
+        print(self.road, "\n")
 
     def run(self, n=0):
         # TODO: More graceful run behavior/UI
