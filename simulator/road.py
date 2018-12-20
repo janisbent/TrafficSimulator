@@ -6,7 +6,7 @@ from .situation import Situation
 
 # TODO: docstring
 class Road:
-    def __init__(self, nlanes=1, spawn=0.6, length=100):
+    def __init__(self, nlanes=1, spawn=0.6, length=10):
         self.lanes = [EdgeLane(0, length=length, marker="=")]
         for _ in range(nlanes):
             self.lanes += [DrivingLane(len(self.lanes), spawnr=spawn / nlanes, length=length),
@@ -38,12 +38,17 @@ class Road:
         for l in self.lanes:
             l.clear()
         for c in self.cars:
-            for i in range(c.dist, c.dist + Car.length):  # TODO: catch out of bounds cars
-                if self[c.lane][i]:
-                    self[c.lane][i].crash()
-                    c.crash()
-                else:
-                    self[c.lane][i] = c
+            try:
+                for i in range(c.dist, c.dist + Car.length):
+                    if self[c.lane][i]:
+                        self[c.lane][i].crash()
+                        c.crash()
+                    else:
+                        self[c.lane][i] = c
+            except IndexError:
+                self.cars.remove(c)
+                self.refresh()
+                break
 
 # TODO: Cars should be stored in Road, not Lane
 

@@ -46,6 +46,7 @@ class Simulator:
                 i = input("'c' to continue, 'q' to quit, 's' for one step, 'h' for help> ")
                 if i == "s":
                     self.one_step()
+                    self.print()
             if i == "c":
                 self.run(n=n)
 
