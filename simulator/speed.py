@@ -8,6 +8,8 @@ class Speed(float):
 
     def mps(self): raise NotImplemented
 
+    def __int__(self): return super(Speed, self).__int__()
+
 
 def asmph(func):
     def tomph(self, s):

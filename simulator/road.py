@@ -10,21 +10,22 @@ class Road:
             self.lanes += [DrivingLane(spawnr=spawn / nlanes, length=length), DottedLane(length=length)]
         self.lanes.pop()
         self.lanes += [EdgeLane(length=length)]
-        # self.lanes = [DrivingLane(spawn=spawn, length=length) for _ in range(nlanes)]
         self.length = length
 
     def __str__(self):
         return "".join(str(l) for l in self.lanes)
 
     def step(self):
+        # print("****")
         for lane in self.lanes:
             lane.step()
+        # print("****"*2)
 
 
 class Lane:
     def __init__(self, spawnr, length, marker):
         self.spawnr = spawnr
-        self.segments = [Segment(length, marker)]
+        self.segments = [Segment(0, length, marker)]
 
     def __str__(self):
         return "".join(map(lambda s: str(s), self.segments)) + "\n"
@@ -37,10 +38,12 @@ class Lane:
 
     def step(self):
         self.spawn()
+        for s in self.segments:
+            s.stepall()
 
     def spawn(self):
         if not self[0] and random.random() < self.spawnr:
-            self[0] = Car(MPH(10))
+            self.segments[0].add_car()
 
 
 class DrivingLane(Lane):
@@ -63,18 +66,58 @@ class DottedLane(Lane):
 
 
 class Segment:
-    def __init__(self, length, marker):
+    def __init__(self, start, length, marker, speedl=MPH(10)):
+        self.start = start
+        self.length = length
+        self.cars = []
+        self.road = [None] * length * Car.length
         self.spots = [None] * length
         self.default = marker
+        self.speedl = speedl
 
     def __getitem__(self, item):
-        return self.spots[item]
+        return self.spots[item - self.start]
 
     def __setitem__(self, key, value):
-        self.spots[key] = value
+        self.spots[key - self.start] = value
 
     def __str__(self):
+        self.refresh()
         ret = "".join(self.default * (len(self.spots) // len(self.default)))
         return "".join(str(d_s[1]) if d_s[1] else d_s[0] for d_s in zip(ret, self.spots))
-        # return "".join(map((lambda s: str(s) if s else (self.default len(self.default))), self.spots))
+
+    def __len__(self):
+        return self.length
+
+    def refresh(self):
+        # print("ref - be", self.cars)
+        self.road = [None] * self.length * Car.length
+        self.spots = [None] * self.length
+        for c in self.cars:
+            start = c.pos - self.start
+            for i in range(start, start + Car.length):
+                if self.road[i]:
+                    self.road[i].crash()
+                    c.crash()
+                else:
+                    self.road[i] = c
+            self.spots[c.pos // Car.length] = c
+        # print("ref - af", self.cars)
+
+    def add_car(self, car=None):
+        if car:
+            self.cars += car
+        else:
+            # print(self.cars)
+            self.cars.append(Car(MPH(self.speedl)))
+            # print(self.cars)
+
+    def stepall(self):
+        # print("ste - be", self.cars)
+        for c in self.cars:
+            # print("Speed: %f\tPos:%d" % (c.speed, c.pos))
+            c.drive(None)
+            # print("Speed: %f\tPos:%d" % (c.speed, c.pos))
+        self.refresh()
+        # print("ste - af", self.cars)
 

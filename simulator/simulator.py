@@ -4,8 +4,8 @@ from .road import Road
 
 class Simulator:
     def __init__(self, args):
-        self.sleep_dur = .5
-        self.road = Road(nlanes=3)
+        self.sleep_dur = .1
+        self.road = Road(nlanes=3, spawn=.05)
         self.ncars = args.ncars
         self.tstep = 0
 
