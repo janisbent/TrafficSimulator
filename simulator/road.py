@@ -13,8 +13,10 @@ class Road:
         self.lanes.pop()
         self.lanes += [EdgeLane(length=length)]
         self.length = length
+        self.cars = []
 
     def __str__(self):
+        self.refresh()
         return "".join(str(l) for l in self.lanes)
 
     def __getitem__(self, item):
@@ -24,13 +26,25 @@ class Road:
         self.lanes[key] = value
 
     def step(self):
-        # print("****")
-        for lane in self.lanes:
-            lane.step()
-        # print("****"*2)
+        for l in self.lanes:
+            c = l.spawn()
+            if c:
+                self.cars.append(c)
+        for c in self.cars:
+            c.drive(Situation())  # TODO: Update Situation
+
+    def refresh(self):
+        for l in self.lanes:
+            l.clear()
+        for c in self.cars:
+            for i in range(c.dist, c.dist + Car.length):  # TODO: catch out of bounds cars
+                if self[c.lane][i]:
+                    self[c.lane][i].crash()
+                    c.crash()
+                else:
+                    self[c.lane][i] = c
 
 # TODO: Cars should be stored in Road, not Lane
-# TODO: Segments should probably have lanes, not vice versa
 
 
 class Lane:
@@ -47,14 +61,13 @@ class Lane:
     def __setitem__(self, key, value):
         self.segments[0][key] = value
 
-    def step(self):
-        self.spawn()
-        for s in self.segments:
-            s.stepall()
-
     def spawn(self):
-        if not self[0] and random.random() < self.spawnr:
-            self.segments[0].add_car()
+        if not self[Car.length - 1] and random.random() < self.spawnr:
+            return Car(MPH(self.segments[0].speedl), 1)
+
+    def clear(self):
+        for s in self.segments:
+            s.clear()
 
 
 class DrivingLane(Lane):
@@ -80,48 +93,28 @@ class Segment:
     def __init__(self, start, length, marker, speedl=MPH(10)):
         self.start = start
         self.length = length
-        self.cars = []
         self.road = [None] * length * Car.length
         self.spots = [None] * length
         self.default = marker
         self.speedl = speedl
 
     def __getitem__(self, item):
-        return self.spots[item - self.start]
+        return self.road[item - self.start]
 
-    def __setitem__(self, key, value):
-        self.spots[key - self.start] = value
+    def __setitem__(self, key, car):
+        self.road[key - self.start] = car
+        if car:
+            self.spots[car.dist // Car.length] = car
 
     def __str__(self):
-        self.refresh()
         ret = "".join(self.default * (len(self.spots) // len(self.default)))
         return "".join(str(d_s[1]) if d_s[1] else d_s[0] for d_s in zip(ret, self.spots))
 
     def __len__(self):
         return self.length
 
-    def refresh(self):
+    def clear(self):
         self.road = [None] * self.length * Car.length  # TODO: default road instead of None
         self.spots = [None] * self.length
-        for c in self.cars:
-            start = c.pos - self.start
 
-            for i in range(start, start + Car.length):  # TODO: catch out of bounds cars
-                if self.road[i]:
-                    self.road[i].crash()
-                    c.crash()
-                else:
-                    self.road[i] = c
-            self.spots[c.pos // Car.length] = c
-
-    def add_car(self, car=None):
-        if car:
-            self.cars += car
-        else:
-            self.cars.append(Car(MPH(self.speedl)))
-
-    def stepall(self):
-        for c in self.cars:
-            c.drive(Situation())  # TODO: Update Situation
-        self.refresh()  # TODO: Figure out how to hand off cars between segments
 
