@@ -1,8 +1,10 @@
 import random
 from .car import Car, Truck
 from .speed import MPH
+from .situation import Situation
 
 
+# TODO: docstring
 class Road:
     def __init__(self, nlanes=1, spawn=0.6, length=100):
         self.lanes = [EdgeLane(length=length, marker="=")]
@@ -15,11 +17,20 @@ class Road:
     def __str__(self):
         return "".join(str(l) for l in self.lanes)
 
+    def __getitem__(self, item):
+        return self.lanes[item]
+
+    def __setitem__(self, key, value):
+        self.lanes[key] = value
+
     def step(self):
         # print("****")
         for lane in self.lanes:
             lane.step()
         # print("****"*2)
+
+# TODO: Cars should be stored in Road, not Lane
+# TODO: Segments should probably have lanes, not vice versa
 
 
 class Lane:
@@ -90,34 +101,27 @@ class Segment:
         return self.length
 
     def refresh(self):
-        # print("ref - be", self.cars)
-        self.road = [None] * self.length * Car.length
+        self.road = [None] * self.length * Car.length  # TODO: default road instead of None
         self.spots = [None] * self.length
         for c in self.cars:
             start = c.pos - self.start
-            for i in range(start, start + Car.length):
+
+            for i in range(start, start + Car.length):  # TODO: catch out of bounds cars
                 if self.road[i]:
                     self.road[i].crash()
                     c.crash()
                 else:
                     self.road[i] = c
             self.spots[c.pos // Car.length] = c
-        # print("ref - af", self.cars)
 
     def add_car(self, car=None):
         if car:
             self.cars += car
         else:
-            # print(self.cars)
             self.cars.append(Car(MPH(self.speedl)))
-            # print(self.cars)
 
     def stepall(self):
-        # print("ste - be", self.cars)
         for c in self.cars:
-            # print("Speed: %f\tPos:%d" % (c.speed, c.pos))
-            c.drive(None)
-            # print("Speed: %f\tPos:%d" % (c.speed, c.pos))
-        self.refresh()
-        # print("ste - af", self.cars)
+            c.drive(Situation())  # TODO: Update Situation
+        self.refresh()  # TODO: Figure out how to hand off cars between segments
 

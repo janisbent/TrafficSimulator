@@ -2,6 +2,7 @@ import time
 from .road import Road
 
 
+# TODO: docstring
 class Simulator:
     def __init__(self, args):
         self.sleep_dur = .1
@@ -9,14 +10,15 @@ class Simulator:
         self.ncars = args.ncars
         self.tstep = 0
 
+    # TODO: figure out string representation
     def __str__(self):
-        return "road"
+        return "Simulator()"
 
     def __repr__(self):
         return "Simulator()"
 
     def setup(self):
-        pass
+        pass  # TODO: Simulator setup
 
     def reset(self):
         self.tstep = 0
@@ -27,6 +29,7 @@ class Simulator:
         print()
 
     def run(self, n=0):
+        # TODO: More graceful run behavior/UI
         try:
             if n > 0:
                 while self.tstep < n:
@@ -48,6 +51,7 @@ class Simulator:
                 self.run(n=n)
 
     def help(self):
+        # TODO: Simulator help message
         print("Todo...")
 
     def one_step(self):

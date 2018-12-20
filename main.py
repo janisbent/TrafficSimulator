@@ -1,6 +1,8 @@
 import argparse
 from simulator.simulator import Simulator
 
+
+# TODO: Handle customization better (problably config file)
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--nlanes", default=1, help="Number of lanes")

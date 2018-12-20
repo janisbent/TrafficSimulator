@@ -1,6 +1,6 @@
 
 
-
+# TODO: docstring
 class Vehicle:
     crash_acc = 10
 
@@ -11,6 +11,7 @@ class Vehicle:
         self.gran = gran
 
     def drive(self, sit):
+        # TODO: Handle situation
         if self.crashed and self.speed > 0:
             self.speed = max(0, self.speed - (self.crash_acc * self.gran))
         self.pos += int(self.speed * self.gran)
@@ -34,3 +35,6 @@ class Truck(Vehicle):
 
     def __init__(self, speed):
         super(Truck, self).__init__(speed)
+
+    def __str__(self):
+        return "*" if self.crashed else "D"
